@@ -9,7 +9,7 @@ const router = express();
 router.use(express.json());
 router.use(
   cors({
-    origin: "https://gifted-shirley-74fd25.netlify.app/",
+    origin: "*",
   })
 );
 dotenv.config();
