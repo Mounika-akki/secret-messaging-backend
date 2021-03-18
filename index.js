@@ -7,7 +7,11 @@ const bcrypt = require("bcrypt");
 
 const router = express();
 router.use(express.json());
-router.use(cors());
+router.use(
+  cors({
+    origin: "https://gifted-shirley-74fd25.netlify.app/",
+  })
+);
 dotenv.config();
 
 const mongoClient = mongodb.MongoClient;
@@ -50,7 +54,9 @@ router.get("/", (req, res) => {
 
 router.post("/create-message", async (req, res) => {
   try {
-    const client = await mongoClient.connect(DB_URL);
+    const client = await mongoClient.connect(DB_URL, {
+      useUnifiedTopology: true,
+    });
     const db = client.db("secretMessaging");
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(req.body.password, salt);
@@ -65,11 +71,11 @@ router.post("/create-message", async (req, res) => {
     mailData.to = req.body.targetMail;
     mailData.html = mailMessage(usrMailUrl);
 
-    transporter.sendMail(mailData, function (err, info) {
+    transporter.sendMail(mailData, function (err, data) {
       if (err) {
         console.log(err);
       } else {
-        console.log(info);
+        console.log(data);
       }
     });
     res.status(200).json({
@@ -80,7 +86,7 @@ router.post("/create-message", async (req, res) => {
     console.log(error);
     res.status(500).send(error.message);
   } finally {
-    client.close();
+    await client.close();
   }
 });
 
