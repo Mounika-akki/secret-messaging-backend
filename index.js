@@ -9,7 +9,7 @@ const router = express();
 router.use(express.json());
 router.use(
   cors({
-    origin: "*",
+    origin: true,
   })
 );
 dotenv.config();
